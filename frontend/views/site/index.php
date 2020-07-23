@@ -5,9 +5,8 @@ use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
-/* @var $this yii\web\View */
 
-$this->title = 'My Yii Application';
+$this->title = 'Uploaded files';
 $gridId = 'tablefile-grid';
 ?>
 
@@ -22,6 +21,7 @@ $gridId = 'tablefile-grid';
                     ]); ?>
             </div>
         </div>
+    </div>
         <div class="box-body">
 
             <?php Pjax::begin(); ?>
@@ -38,6 +38,7 @@ $gridId = 'tablefile-grid';
                                 $date = new DateTime($model->created_at);
                                 return $date->format('d.m.Y H:i');
                             },
+                            'filter' => false,
                         ],
                         'name',
                         [

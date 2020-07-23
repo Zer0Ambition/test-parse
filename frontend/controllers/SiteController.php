@@ -103,7 +103,7 @@ class SiteController extends Controller
                 Yii::$app->params['uploadPath'] = Yii::$app->basePath . '/web/uploads/tables/';
                 $path = Yii::$app->params['uploadPath'] . $web_filename;
                 if ($file->saveAs($path)) {
-                    $model = new TableFile();
+                    $model = new TableFile(); //Create model and save in db file info
                     $model->name = $file->name;
                     $model->web_filename = $web_filename;
                     $model->path = $path;
@@ -129,13 +129,50 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays a single TableFile model.
+     * Displays a single TableFile model and parses data from HTML file.
      * @param integer $id
      * @return mixed
      */
     public function actionView($id) {
         $model = $this->findModel($id);
+
+        //Load HTML file
+        $data = file_get_contents($model->path);
+        $dom = new \domDocument;
+        $dom->loadHTML($data);
+        $dom->preserveWhiteSpace = false;
+        $tables = $dom->getElementsByTagName('table');
+
+        $rows = $tables->item(0)->getElementsByTagName('tr');
+
+        //Find a "Profit" and "Close Time" column`s indexes
+        foreach ($rows as $row) {
+            $cols = $row->getElementsByTagName('td');
+            $i = 0;
+            foreach($cols as $col) {
+                if ($col->textContent == "Profit") {
+                    $indexProfit = $i;
+                }
+
+                if ($col->textContent == "Close Time") {
+                    $indexDate = $i;
+                }
+                $i++;
+            }
+        }
+
+        $i = 0;
+
+        //Get text from columns
+        foreach ($rows as $row) {
+            $cols = $row->getElementsByTagName('td');
+            $result[$i]['date'] = $cols->item($indexDate)->textContent;
+            $result[$i]['profit'] = $cols->item($indexProfit)->textContent;
+            $i++;
+        }
+
         return $this->render('view', [
+            'result' => $result,
             'model' => $model,
         ]);
     }
