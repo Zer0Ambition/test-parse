@@ -148,6 +148,20 @@ class SiteController extends Controller
         ]);
     }
 
+     /**
+     * Changes to deleted status an existing TableFile model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionDelete($id) {
+        $model = $this->findModel($id);
+        $model->status = TableFile::STATUS_DELETED;
+        $model->save();
+
+        return $this->redirect(['index']);
+    }
+
     /**
      * Logs in a user.
      *
