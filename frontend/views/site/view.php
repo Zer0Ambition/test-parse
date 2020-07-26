@@ -8,6 +8,14 @@ $this->registerJsFile('/amcharts/charts.js', ['position' => \yii\web\View::POS_E
 $this->registerJsFile('/amcharts/themes/animated.js', ['position' => \yii\web\View::POS_END]);
 $this->registerJsFile('/amcharts/lang/en.js', ['position' => \yii\web\View::POS_END]);
 
+$this->title = "Table Files";
+$this->params['subtitle'] = "Parsed table data";
+$this->params['breadcrumbs'][] = [
+    'label' => $this->title,
+    'url' => ['index']
+];
+$this->params['breadcrumbs'][] = $this->params['subtitle'];
+
 $result = json_encode($result);
 
 $script = <<< JS
@@ -41,7 +49,7 @@ am4core.ready(function() {
     var series = chart.series.push(new am4charts.LineSeries());
 
     series.dataFields.dateX = "date";
-    series.dataFields.valueY = "profit";
+    series.dataFields.valueY = "balance";
     series.tooltipText = "[bold]{valueY}[/]";
     series.fillOpacity = 0.3;
     series.bullets.push(new am4charts.CircleBullet());
@@ -63,6 +71,15 @@ $this->registerJs($script);
 ?>
 
 <div class="box-body">
+    
+<?if (!empty($result)) {?>
+    <div id="chartdiv" class="chartdiv" style="height:700px">
+        <div class="chartdiv__loading"></div>
+    </div>
+    <?}
+    else {
+        ?><h2>Failed to parse file</h2>
+    <?}?>
 <?= DetailView::widget([
     'model' => $model,
     'attributes' => [
@@ -92,8 +109,4 @@ $this->registerJs($script);
     ]
 ]);
 ?>
-
-    <div id="chartdiv" class="chartdiv" style="height:700px">
-        <div class="chartdiv__loading"></div>
-    </div>
 </div>

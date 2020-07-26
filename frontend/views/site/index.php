@@ -6,7 +6,10 @@ use yii\helpers\ArrayHelper;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 
-$this->title = 'Uploaded files';
+$this->title = "Table files";
+$this->params['subtitle'] = "File list";
+$this->params['breadcrumbs'][] = $this->title;
+
 $gridId = 'tablefile-grid';
 ?>
 
@@ -14,12 +17,13 @@ $gridId = 'tablefile-grid';
     <div class="box box-default">
         <div class="box-header">
             <div class="pull-right">
-                <?= Html::a('<i class="fa fa-plus"></i>', ['upload'],
+                <?= Html::a('Upload file', ['upload'],
                     [
                         'class' => 'btn btn-primary btn-sm',
-                        'title' => 'Load table'
+                        'title' => 'HTML table',
+                        'style' => 'margin-bottom: 10px'
                     ]); ?>
-            </div>
+            </div>  
         </div>
     </div>
         <div class="box-body">

@@ -11,6 +11,7 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use common\models\LoginForm;
 use common\models\TableFile;
+use common\models\TableParser;
 use frontend\models\TableFileSearch as ModelSearch;
 use frontend\models\UploadForm;
 use frontend\models\PasswordResetRequestForm;
@@ -123,6 +124,9 @@ class SiteController extends Controller
                     }
                 }
             }
+            else {
+                Yii::$app->session->setFlash('danger', Yii::t('app', 'File could not be saved!'));
+            }
         }
 
         return $this->render('upload', ['model' => $model]);
@@ -135,41 +139,8 @@ class SiteController extends Controller
      */
     public function actionView($id) {
         $model = $this->findModel($id);
-
-        //Load HTML file
-        $data = file_get_contents($model->path);
-        $dom = new \domDocument;
-        $dom->loadHTML($data);
-        $dom->preserveWhiteSpace = false;
-        $tables = $dom->getElementsByTagName('table');
-
-        $rows = $tables->item(0)->getElementsByTagName('tr');
-
-        //Find a "Profit" and "Close Time" column`s indexes
-        foreach ($rows as $row) {
-            $cols = $row->getElementsByTagName('td');
-            $i = 0;
-            foreach($cols as $col) {
-                if ($col->textContent == "Profit") {
-                    $indexProfit = $i;
-                }
-
-                if ($col->textContent == "Close Time") {
-                    $indexDate = $i;
-                }
-                $i++;
-            }
-        }
-
-        $i = 0;
-
-        //Get text from columns
-        foreach ($rows as $row) {
-            $cols = $row->getElementsByTagName('td');
-            $result[$i]['date'] = $cols->item($indexDate)->textContent;
-            $result[$i]['profit'] = $cols->item($indexProfit)->textContent;
-            $i++;
-        }
+        $parser = new TableParser;  //make instanse of TableParser
+        $result = $parser->parseHTMLTable($model->path);    //parse HTML table
 
         return $this->render('view', [
             'result' => $result,
